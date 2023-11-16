@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
 import Service.MessageService;
 import io.javalin.Javalin;
@@ -36,6 +37,9 @@ public class SocialMediaController {
         //app.get("example-endpoint", this::exampleHandler);
         app.get("/accounts", this::getAllAccountsHandler);
         app.post("/accounts", this::postAccountHandler);
+        app.get("/messages", this::getAllMessagesHandler);
+        app.get("/messages/available", this::getAllAvailableMessagesHandler);
+        app.post("/books", this::postMessageHandler);
         //app.start(8080);
         
         
@@ -73,5 +77,41 @@ public class SocialMediaController {
         List<Account> accounts = accountService.getAllAccounts();
         context.json(accounts);
     }
+
+    /**
+     * Handler to retrieve all messages
+     * @param ctx
+     */
+    private void getAllMessagesHandler(Context ctx){
+        List<Message> messages = messageService.getAllMessages();
+        ctx.json(messages);
+    }
+
+    /**
+     * Handler to create new message
+     * @param ctx handles HTTP requests
+     * @throws JsonProcessingException will be thrown if there is an issue
+     */
+    private void postMessageHandler(Context ctx) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Message message = mapper.readValue(ctx.body(), Message.class);
+        Message addedMessage = messageService.creatMessage(message);
+
+        if(addedMessage != null){
+            ctx.json(mapper.writeValueAsString(addedMessage));
+        }else{
+            ctx.status(400);
+        }
+    }
+
+    /**
+     * Handler get all available messages that != NULL
+     * @param context
+     */
+    private void getAllAvailableMessagesHandler(Context context){
+        context.json(messageService.getAllAvailableMessages());
+    }
+
+
 
 }
