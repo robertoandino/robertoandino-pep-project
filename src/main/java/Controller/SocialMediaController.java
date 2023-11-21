@@ -35,10 +35,9 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         //app.get("example-endpoint", this::exampleHandler);
-        app.get("/accounts", this::getAllAccountsHandler);
         app.post("/accounts", this::postAccountHandler);
         app.get("/messages", this::getAllMessagesHandler);
-        app.get("/messages/available", this::getAllAvailableMessagesHandler);
+        app.get("/messages/id", this::getMessageByIdHandler);
         app.post("/books", this::postMessageHandler);
         //app.start(8080);
         
@@ -54,14 +53,14 @@ public class SocialMediaController {
     private void postAccountHandler(Context ctx) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(ctx.body(), Account.class);
-        
+        Account addedAccount = accountService.addAccount(account);
+
         //check password length
         if(account.getPassword().length() < 4){
             ctx.status(400).result("Password length must be at least 4 characters");
             return;
         }
         
-        Account addedAccount = accountService.addAccount(account);
         if(addedAccount!=null){
             ctx.json(mapper.writeValueAsString(addedAccount));
         }else{
@@ -69,14 +68,8 @@ public class SocialMediaController {
         }
     }
 
-    /**
-     * This is an example handler for an example endpoint.
-     * @param context The Javalin Context object manages information about both the HTTP request and response.
-     */
-    private void getAllAccountsHandler(Context context) {
-        List<Account> accounts = accountService.getAllAccounts();
-        context.json(accounts);
-    }
+    
+
 
     /**
      * Handler to retrieve all messages
@@ -104,13 +97,28 @@ public class SocialMediaController {
         }
     }
 
-    /**
-     * Handler get all available messages that != NULL
-     * @param context
-     */
-    private void getAllAvailableMessagesHandler(Context context){
-        context.json(messageService.getAllAvailableMessages());
+
+    public void getMessageByIdHandler(Context ctx){
+        
+        String messageId = ctx.pathParam("id");
+
+        int message_id = Integer.parseInt(messageId);
+        //Message message = messageService.getMessageById(message_id);
+
+        //ctx.status(200);
+
+        //ctx.json(message);
+        
+        ctx.json(messageService.getMessageById(message_id));
+
     }
+
+
+
+
+
+
+    
 
 
 

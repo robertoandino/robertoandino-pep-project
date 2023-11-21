@@ -3,7 +3,7 @@ package Service;
 import Model.Account;
 import DAO.AccountDAO;
 
-import java.util.List;
+//import java.util.List;
 
 public class AccountService {
     private AccountDAO accountDAO;
@@ -25,17 +25,6 @@ public class AccountService {
     }
 
     /**
-     * Retrieve all accounts
-     * @return all accounts
-     */
-    public List<Account> getAllAccounts(){
-
-        List<Account> accounts = accountDAO.getAllAccounts();
-        
-        return accounts;
-    }
-
-    /**
      * Add new account
      * 
      * @param account account object
@@ -48,4 +37,8 @@ public class AccountService {
         return test;
     }
     
+    public boolean accountExists(String username) {
+        
+        return accountDAO.getAccountByUsername(username) != null;
+    }
 }

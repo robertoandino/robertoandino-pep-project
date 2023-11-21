@@ -4,34 +4,10 @@ import Model.Account;
 import Util.ConnectionUtil;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 
 public class AccountDAO {
-    
-    /**
-     * Retrieve all user accounts
-     * @return all Accounts.
-     */
-    public List<Account> getAllAccounts(){
-
-        Connection connection = ConnectionUtil.getConnection();
-        List<Account> accounts = new ArrayList<>();
-        try{
-            String sql = "SELECT * FROM Account";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            ResultSet rs = preparedStatement.executeQuery();
-            while(rs.next()){
-                Account account = new Account(rs.getString("username"), rs.getString("password"));
-                accounts.add(account);
-            }
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-
-        return accounts;
-
-    }
     
     /**
      * //create new user account
@@ -54,7 +30,7 @@ public class AccountDAO {
                 
                 ResultSet pkeyResultSet = preparedStatement.getGeneratedKeys();
                 if(pkeyResultSet.next()){
-                    int generatedAccountId = pkeyResultSet.getInt(1);
+                    int generatedAccountId = (int) pkeyResultSet.getInt(1);
                     return new Account(generatedAccountId, account.getUsername(), account.getPassword());
                     //return new Account(account.getUsername(), account.getPassword());
                 }
@@ -63,6 +39,29 @@ public class AccountDAO {
                 System.out.println(e.getMessage());
         }
         
+        return null;
+    }
+
+    public Account getAccountByUsername(String username) {
+        Connection connection = ConnectionUtil.getConnection();
+
+        try {
+            String sql = "SELECT * FROM Account WHERE username = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, username);
+
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                return new Account(
+                        rs.getInt("account_id"),
+                        rs.getString("username"),
+                        rs.getString("password")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception properly in your actual code
+        }
+
         return null;
     }
 

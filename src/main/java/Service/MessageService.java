@@ -3,6 +3,7 @@ package Service;
 import DAO.MessageDAO;
 import Model.Message;
 
+//import java.util.Collections;
 import java.util.List;
 
 public class MessageService {
@@ -24,7 +25,7 @@ public class MessageService {
         this.messageDAO = messageDAO;
     }
 
-    /**
+     /**
      * Retrieve all messages
      * @return all messages
      */
@@ -36,9 +37,13 @@ public class MessageService {
 
     }
 
+    public Message getMessageById(int id){
+        return messageDAO.getMessageById(id);
+    }
+
     public Message creatMessage(Message message){
 
-        if(messageDAO.getMessagesById(message.getMessage_id()) != null){
+        if(messageDAO.getMessageById(message.getMessage_id()) != null){
 
             return null;
         }
@@ -48,12 +53,8 @@ public class MessageService {
         return persistedMessage;
     }
 
-    public List<Message> getAllAvailableMessages(){
 
-        List<Message> messages = messageDAO.getAllAvailableMessages();
 
-        return messages;
-    }
 
 
 
