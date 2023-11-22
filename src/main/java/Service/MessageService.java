@@ -9,6 +9,7 @@ import java.util.List;
 public class MessageService {
     
     public MessageDAO messageDAO;
+    public Message messageTest;
 
     /**
      * Constructor to create a MessageDAO.
@@ -18,7 +19,7 @@ public class MessageService {
     }
 
     /**
-     * Constructor for mock behavior of BookDAO
+     * Constructor for mock behavior of messageDAO
      * @param messageDAO
      */
     public MessageService(MessageDAO messageDAO){
@@ -37,20 +38,59 @@ public class MessageService {
 
     }
 
+    /**
+     * Retrieve message by ID
+     * @param id
+     * @return message retrieved
+     */
     public Message getMessageById(int id){
+
         return messageDAO.getMessageById(id);
     }
 
+    /**
+     * Create new message
+     * @param message
+     * @return created message
+     */
     public Message creatMessage(Message message){
 
-        if(messageDAO.getMessageById(message.getMessage_id()) != null){
-
-            return null;
+        if(validateMessage(message)){
+            return messageDAO.createNewMessage(message);
         }
 
-        Message persistedMessage = messageDAO.createNewMessage(message);
+        return null;
+    }
 
-        return persistedMessage;
+    /*
+     * Delete message
+     */
+    public Message deleteMessage(Message message){
+
+        return messageDAO.deleteMessage(message);
+    }
+
+    /**
+     * Validates message
+     * @param message
+     * @return false or true
+     */
+    private boolean validateMessage(Message message){
+
+        String text = message.getMessage_text();
+
+        if(text == ""){
+            System.out.println("Message text cannot be blank");
+            return false;
+        }else if(text.length() > 254){
+            System.out.println("Message exceeds 254 characters");
+            return false;
+        }else if(!messageDAO.doesUserExist(message.getPosted_by())){
+            System.out.println("User not found in database");
+            return false;
+        }
+
+        return true;
     }
 
 

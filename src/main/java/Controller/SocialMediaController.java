@@ -37,8 +37,9 @@ public class SocialMediaController {
         //app.get("example-endpoint", this::exampleHandler);
         app.post("/accounts", this::postAccountHandler);
         app.get("/messages", this::getAllMessagesHandler);
-        app.get("/messages/id", this::getMessageByIdHandler);
-        app.post("/books", this::postMessageHandler);
+        app.get("/messages/{id}", this::getMessageByIdHandler);
+        app.post("/messages", this::postMessageHandler);
+        app.delete("/messages/{messageId}", this::deleteMessageHandler);
         //app.start(8080);
         
         
@@ -68,9 +69,6 @@ public class SocialMediaController {
         }
     }
 
-    
-
-
     /**
      * Handler to retrieve all messages
      * @param ctx
@@ -97,20 +95,44 @@ public class SocialMediaController {
         }
     }
 
-
+    /**
+     * Handler to get message by id
+     * @param ctx
+     */
     public void getMessageByIdHandler(Context ctx){
         
         String messageId = ctx.pathParam("id");
-
         int message_id = Integer.parseInt(messageId);
-        //Message message = messageService.getMessageById(message_id);
+        Message message = messageService.getMessageById(message_id);
 
-        //ctx.status(200);
+        if(message == null){
 
-        //ctx.json(message);
+            ctx.status(200).result("");
+
+        }else{
+    
+            ctx.json(message);
+        }
         
-        ctx.json(messageService.getMessageById(message_id));
 
+    }
+
+    /**
+     * Handler to delete message
+     * @param ctx
+     */
+    public void deleteMessageHandler(Context ctx){
+
+        int messageId = Integer.parseInt(ctx.pathParam("messageId"));
+        Message message = messageService.getMessageById(messageId);
+
+        if(message == null)
+        {
+            ctx.status(200).result("");
+        
+        }else{
+            ctx.json(message);
+        }
     }
 
 
