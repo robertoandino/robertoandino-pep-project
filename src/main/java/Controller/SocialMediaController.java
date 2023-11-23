@@ -1,8 +1,6 @@
 package Controller;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,8 +42,6 @@ public class SocialMediaController {
         app.post("/messages", this::postMessageHandler);
         app.delete("/messages/{messageId}", this::deleteMessageHandler);
         app.patch("/messages/{id}", this::updateMessageTextHandler);
-        //app.start(8080);
-        
         
         return app;
     }
@@ -148,6 +144,10 @@ public class SocialMediaController {
         }
     }
 
+    /**
+     * Handler to update message
+     * @param ctx
+     */
     public void updateMessageTextHandler(Context ctx) {
          
          int messageId = Integer.parseInt(ctx.pathParam("id"));
@@ -156,23 +156,14 @@ public class SocialMediaController {
          Message message = messageService.updateMessage(messageId, newMessageText);
 
          
-         if (message != null) {
+        if (message != null) {
              
              Message updatedMessage = messageService.getMessageById(messageId);
              ctx.status(200).json(updatedMessage);
          } else {
-                 ctx.status(400).result(""); 
-             }
-        
-        
-    }
-
-
-
-
-
+            ctx.status(400).result("");
+        }
     
-
-
+    }
 
 }

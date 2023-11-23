@@ -3,7 +3,6 @@ package Service;
 import DAO.MessageDAO;
 import Model.Message;
 
-//import java.util.Collections;
 import java.util.List;
 
 public class MessageService {
@@ -38,6 +37,11 @@ public class MessageService {
 
     }
 
+    /**
+     * Gets all messages posted by given user 
+     * @param accountId
+     * @return
+     */
     public List<Message> getAllMessagesFromUser(int accountId){
         
         return messageDAO.getMessagesByUser(accountId);
@@ -67,20 +71,24 @@ public class MessageService {
         return null;
     }
 
+    /*
+     * Updates message if conditions are met
+     */
     public Message updateMessage(int messageId, String newText){
 
-        if(newText == ""){
+        if(messageDAO.getMessageById(messageId) == null){
+            System.out.println("Message does not exist");
+            return null;
+        }else if(newText.isEmpty()){
             System.out.println("Message text cannot be blank");
             return null;
         }else if(newText.length() > 254){
             System.out.println("Message exceeds 254 characters");
             return null;
-        }else if(!messageDAO.doesUserExist(messageTest.getPosted_by())){
-            System.out.println("User not found in database");
-            return null;
         }
-
+        
         return messageDAO.updateMessageText(messageId, newText);
+        
     }
 
     /*
@@ -100,7 +108,7 @@ public class MessageService {
 
         String text = message.getMessage_text();
 
-        if(text == ""){
+        if(text.isEmpty()){
             System.out.println("Message text cannot be blank");
             return false;
         }else if(text.length() > 254){
@@ -108,6 +116,9 @@ public class MessageService {
             return false;
         }else if(!messageDAO.doesUserExist(message.getPosted_by())){
             System.out.println("User not found in database");
+            return false;
+        }else if(messageDAO.getMessageById(message.getMessage_id()) == null){
+            System.out.println("Message does not exist");
             return false;
         }
 

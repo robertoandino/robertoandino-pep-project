@@ -3,8 +3,6 @@ package DAO;
 import Util.ConnectionUtil;
 import Model.Message;
 
-//import static org.mockito.Mockito.ignoreStubs;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -43,6 +41,11 @@ public class MessageDAO {
         return messages;
     }
 
+    /**
+     * Gets message by user who posted it
+     * @param userId
+     * @return
+     */
     public List<Message> getMessagesByUser(int userId){
 
         Connection connection = ConnectionUtil.getConnection();
@@ -129,6 +132,12 @@ public class MessageDAO {
         return null;
     }
 
+    /**
+     * Updates message 
+     * @param message_id
+     * @param newText
+     * @return update message if successful if not it returns null
+     */
     public Message updateMessageText(int message_id, String newText){
         Connection connection = ConnectionUtil.getConnection();
         try{
@@ -143,6 +152,7 @@ public class MessageDAO {
             if(rowsAffected > 0){
                 return getMessageById(message_id);
             }
+
 
         }catch(SQLException e){
             e.printStackTrace();
