@@ -1,6 +1,8 @@
 package Controller;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,10 +38,12 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         //app.get("example-endpoint", this::exampleHandler);
         app.post("/accounts", this::postAccountHandler);
+        app.get("accounts/{accountId}/messages", this::getAllMessagesFromUserHandler);
         app.get("/messages", this::getAllMessagesHandler);
         app.get("/messages/{id}", this::getMessageByIdHandler);
         app.post("/messages", this::postMessageHandler);
         app.delete("/messages/{messageId}", this::deleteMessageHandler);
+        app.patch("/messages/{id}", this::updateMessageTextHandler);
         //app.start(8080);
         
         
@@ -75,6 +79,15 @@ public class SocialMediaController {
      */
     private void getAllMessagesHandler(Context ctx){
         List<Message> messages = messageService.getAllMessages();
+        ctx.json(messages);
+    }
+
+    private void getAllMessagesFromUserHandler(Context ctx){
+        
+        int accountId = Integer.parseInt(ctx.pathParam("accountId"));
+
+        List<Message> messages = messageService.getAllMessagesFromUser(accountId);
+        
         ctx.json(messages);
     }
 
@@ -135,6 +148,24 @@ public class SocialMediaController {
         }
     }
 
+    public void updateMessageTextHandler(Context ctx) {
+         
+         int messageId = Integer.parseInt(ctx.pathParam("id"));
+         String newMessageText = ctx.bodyAsClass(Message.class).getMessage_text();
+
+         Message message = messageService.updateMessage(messageId, newMessageText);
+
+         
+         if (message != null) {
+             
+             Message updatedMessage = messageService.getMessageById(messageId);
+             ctx.status(200).json(updatedMessage);
+         } else {
+                 ctx.status(400).result(""); 
+             }
+        
+        
+    }
 
 
 

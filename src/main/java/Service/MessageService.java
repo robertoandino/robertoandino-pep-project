@@ -38,6 +38,11 @@ public class MessageService {
 
     }
 
+    public List<Message> getAllMessagesFromUser(int accountId){
+        
+        return messageDAO.getMessagesByUser(accountId);
+    }
+
     /**
      * Retrieve message by ID
      * @param id
@@ -60,6 +65,22 @@ public class MessageService {
         }
 
         return null;
+    }
+
+    public Message updateMessage(int messageId, String newText){
+
+        if(newText == ""){
+            System.out.println("Message text cannot be blank");
+            return null;
+        }else if(newText.length() > 254){
+            System.out.println("Message exceeds 254 characters");
+            return null;
+        }else if(!messageDAO.doesUserExist(messageTest.getPosted_by())){
+            System.out.println("User not found in database");
+            return null;
+        }
+
+        return messageDAO.updateMessageText(messageId, newText);
     }
 
     /*
