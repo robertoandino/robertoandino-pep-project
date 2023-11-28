@@ -62,9 +62,9 @@ public class MessageService {
      * @param message
      * @return created message
      */
-    public Message creatMessage(Message message){
+    public Message createMessage(Message message){
 
-        if(validateMessage(message)){
+        if(validateMessage(message) != false){
             return messageDAO.createNewMessage(message);
         }
 
@@ -108,19 +108,22 @@ public class MessageService {
 
         String text = message.getMessage_text();
 
+        
         if(text.isEmpty()){
             System.out.println("Message text cannot be blank");
             return false;
-        }else if(text.length() > 254){
+        }
+        
+        if(text.length() > 254){
             System.out.println("Message exceeds 254 characters");
             return false;
-        }else if(!messageDAO.doesUserExist(message.getPosted_by())){
+        }
+        
+        if(!messageDAO.doesUserExist(message.getPosted_by())){
             System.out.println("User not found in database");
             return false;
-        }else if(messageDAO.getMessageById(message.getMessage_id()) == null){
-            System.out.println("Message does not exist");
-            return false;
         }
+        
 
         return true;
     }

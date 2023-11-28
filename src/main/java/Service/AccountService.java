@@ -3,8 +3,6 @@ package Service;
 import Model.Account;
 import DAO.AccountDAO;
 
-//import java.util.List;
-
 public class AccountService {
     private AccountDAO accountDAO;
 
@@ -25,18 +23,31 @@ public class AccountService {
     }
 
     /**
-     * Add new account
-     * 
-     * @param account account object
-     * @return persisted account if successful
+     * gets account by username
+     * @param username
+     * @return
      */
-    public Account addAccount(Account account){
-
-        Account test = accountDAO.insertAccount(account);
-
-        return test;
+    public Account getAccountByUsername(String username){
+        return accountDAO.getAccountByUsername(username);
     }
-    
+
+    /**
+     * inserts new account
+     * @param account
+     * @return inserted account or null
+     */
+    public Account newAccount(Account account){
+        if(!accountExists(account.getUsername())){
+            return accountDAO.insertAccount(account);
+        }
+        return null;
+    }
+
+    /**
+     * Checks if account exist
+     * @param username
+     * @return null or not null
+     */    
     public boolean accountExists(String username) {
         
         return accountDAO.getAccountByUsername(username) != null;

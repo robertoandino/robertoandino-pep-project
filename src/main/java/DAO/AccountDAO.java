@@ -4,21 +4,20 @@ import Model.Account;
 import Util.ConnectionUtil;
 
 import java.sql.*;
-//import java.util.ArrayList;
-//import java.util.List;
 
 public class AccountDAO {
     
     /**
-     * //create new user account
-     *
+     * Creates new account
+     * @param account
+     * @return created account if successful
      */
     public Account insertAccount(Account account)
     {
         Connection connection = ConnectionUtil.getConnection();
         
         try{
-            String sql = "INSERT INTO Account (username, password) VALUES (?, ?)";
+            String sql = "INSERT INTO account (username, password) VALUES (?, ?)";
             PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             
             preparedStatement.setString(1, account.getUsername());
@@ -32,7 +31,6 @@ public class AccountDAO {
                 if(pkeyResultSet.next()){
                     int generatedAccountId = (int) pkeyResultSet.getInt(1);
                     return new Account(generatedAccountId, account.getUsername(), account.getPassword());
-                    //return new Account(account.getUsername(), account.getPassword());
                 }
             }
         }catch(SQLException e){
@@ -42,11 +40,16 @@ public class AccountDAO {
         return null;
     }
 
+    /**
+     * Gets account by username
+     * @param username
+     * @return account by username if it exists
+     */
     public Account getAccountByUsername(String username) {
         Connection connection = ConnectionUtil.getConnection();
 
         try {
-            String sql = "SELECT * FROM Account WHERE username = ?";
+            String sql = "SELECT * FROM account WHERE username = ?";
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, username);
 
@@ -59,7 +62,7 @@ public class AccountDAO {
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception properly in your actual code
+            e.printStackTrace(); 
         }
 
         return null;

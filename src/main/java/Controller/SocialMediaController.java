@@ -1,9 +1,10 @@
 package Controller;
 
+
 import java.util.List;
 
+
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import Model.Account;
 import Model.Message;
@@ -35,11 +36,12 @@ public class SocialMediaController {
     public Javalin startAPI() {
         Javalin app = Javalin.create();
         //app.get("example-endpoint", this::exampleHandler);
-        app.post("/accounts", this::postAccountHandler);
         app.get("accounts/{accountId}/messages", this::getAllMessagesFromUserHandler);
         app.get("/messages", this::getAllMessagesHandler);
         app.get("/messages/{id}", this::getMessageByIdHandler);
         app.post("/messages", this::postMessageHandler);
+        app.post("/register", this::registerUserHandler);
+        app.post("/login", this::loginUserHandler);
         app.delete("/messages/{messageId}", this::deleteMessageHandler);
         app.patch("/messages/{id}", this::updateMessageTextHandler);
         
@@ -47,25 +49,73 @@ public class SocialMediaController {
     }
 
     /**
-     * Handler to post new account
+     * Handler to register new account
      * @param ctx Handles HTTP reqests and generates responses within Javalin.
      * @throws JsonProcessingException will be thrown if there is an issue converting JSON into an object. 
      */
-    private void postAccountHandler(Context ctx) throws JsonProcessingException{
-        ObjectMapper mapper = new ObjectMapper();
-        Account account = mapper.readValue(ctx.body(), Account.class);
-        Account addedAccount = accountService.addAccount(account);
+    private void registerUserHandler(Context ctx){
 
-        //check password length
-        if(account.getPassword().length() < 4){
-            ctx.status(400).result("Password length must be at least 4 characters");
+        Account account = ctx.bodyAsClass(Account.class);
+
+        if(account.getUsername() == null || account.getUsername().isEmpty())
+        {
+            System.out.println("Username cannot be blank");
+            ctx.status(400).result("");
             return;
         }
         
-        if(addedAccount!=null){
-            ctx.json(mapper.writeValueAsString(addedAccount));
+        if(account.getPassword() == null || account.getPassword().isEmpty()){
+
+            System.out.println("Password cannot be blank");
+            ctx.status(400).result("");
+            return;
+        }
+        
+        if(account.getPassword().length() < 4){
+            System.out.println("Password must be at least 4 characters long");
+            ctx.status(400).result("");
+            return;
+        }
+        
+        if(accountService.accountExists(account.getUsername())){
+            ctx.status(400).result("");
+            return;
+        }
+
+        Account newAccount = accountService.newAccount(account);
+
+        if(newAccount != null){
+            ctx.status(200).json(newAccount);
         }else{
+            System.out.println("Failed to register account");
+            ctx.status(500);
+        }
+
+        
+
+    }
+    
+    /**
+     * Handler to log in a user
+     * @param ctx
+     */
+    public void loginUserHandler(Context ctx){
+
+        Account account = ctx.bodyAsClass(Account.class);
+        
+        if(account.getUsername() == null || account.getPassword() == null){
+
+            System.out.println("Invalid Input");
             ctx.status(400);
+            return;
+        }
+
+        Account existingAcc = accountService.getAccountByUsername(account.getUsername());
+
+        if(existingAcc == null || !existingAcc.getPassword().equals(account.getPassword())){
+            ctx.status(401).result("");
+        }else{
+            ctx.status(200).json(existingAcc);
         }
     }
 
@@ -93,14 +143,15 @@ public class SocialMediaController {
      * @throws JsonProcessingException will be thrown if there is an issue
      */
     private void postMessageHandler(Context ctx) throws JsonProcessingException{
-        ObjectMapper mapper = new ObjectMapper();
-        Message message = mapper.readValue(ctx.body(), Message.class);
-        Message addedMessage = messageService.creatMessage(message);
+        
+        Message message = ctx.bodyAsClass(Message.class);
+        Message addedMessage = messageService.createMessage(message);
+
 
         if(addedMessage != null){
-            ctx.json(mapper.writeValueAsString(addedMessage));
+            ctx.status(200).json(message);
         }else{
-            ctx.status(400);
+            ctx.status(400).result("");
         }
     }
 
